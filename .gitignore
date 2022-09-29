@@ -3,4 +3,5 @@
 **/*.exe
 **/*.out
 **/index
-files/*
+teg-iris/files/*
+
