@@ -1,6 +1,7 @@
 #ifndef HANDLE_GRAPH_H
 #define HANDLE_GRAPH_H
 
+// Vértice do grafo, com todos os seus parâmetros
 typedef struct vertex {
   int id;
   double a1;
@@ -9,40 +10,39 @@ typedef struct vertex {
   double a4;
 } Vertex;
 
-typedef struct adjacency {
+// Distância entre dois vértices, dados seus parâmetros
+typedef struct distance {
   int v1;
   int v2;
   double distance;
-} Adjacency;
+} Distance;
 
+// Aresta entre dois vértices
 typedef struct edge {
   int v1;
   int v2;
   struct edge *next;
 } Edge;
 
+// Lista de arestas de um grafo
 typedef struct edgeList {
   Edge *first;
   int qtdEdges;
 } EdgeList;
 
-Vertex *
-getVertices(char *fileName, int qtdVertices);
-
+// Funções relacionadas à Vértices
+Vertex *getVertices(char *fileName, int qtdVertices);
 void printVertices(Vertex *vertices, int qtdVertices);
 
-Adjacency *getEuclidianAdjacencies(Vertex *vertices, int qtdVertices, double *max, double *min);
+// Funções relacionadas às distâncias euclidianas e normalizadas
+Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, double *min);
+Distance *getNormalizedDistances(Distance *distances, int qtdVertices, double max, double min);
+void printDistances(Distance *distances, int qtdVertices);
+void exportDistances(char *fileName, Distance *distances, int qtdVertices);
 
-Adjacency *getNormalizedAdjacencies(Adjacency *adjacencies, int qtdVertices, double max, double min);
-
-void printAdjacencies(Adjacency *adjacencies, int qtdVertices);
-
-void exportAdjacencies(char *fileName, Adjacency *adjacencies, int qtdVertices);
-
-EdgeList *getGraphEdges(Adjacency *normalizedAdjacencies, int qtdVertices, double lim);
-
+// Funções relacionadas à obtenção dos grafos
+EdgeList *getGraphEdges(Distance *normalizedDistances, int qtdVertices, double lim);
 void printGraphEdges(EdgeList *list);
-
 void exportGraphEdges(char *fileName, EdgeList *list);
 
 #endif
