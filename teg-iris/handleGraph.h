@@ -14,7 +14,7 @@ typedef struct vertex {
 typedef struct distance {
   int v1;
   int v2;
-  double distance;
+  double value;
 } Distance;
 
 // Aresta entre dois vértices

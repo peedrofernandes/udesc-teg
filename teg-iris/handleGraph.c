@@ -39,17 +39,17 @@ void printVertices(Vertex *vertices, int qtdVertices) {
 } 
 
 
-Adjacency *getEuclidianAdjacencies(Vertex *vertices, int qtdVertices, double *max, double *min) {
-  size_t qtdAdjacencies = qtdVertices * qtdVertices - qtdVertices;
+Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, double *min) {
+  size_t qtdDistances = qtdVertices * qtdVertices - qtdVertices;
 
-  Adjacency *adjacencies = malloc(qtdAdjacencies * sizeof(Adjacency));
+  Distance *distances = malloc(qtdDistances * sizeof(Distance));
 
   if (!max)
     max = 0;
   if (!min)
     min = 0;
 
-  int currentAdj = 0;
+  int currentDistance = 0;
   for (int i = 0; i < qtdVertices; i++) {
     for (int j = 0; j < qtdVertices; j++) {
       if (i == j)
@@ -70,29 +70,29 @@ Adjacency *getEuclidianAdjacencies(Vertex *vertices, int qtdVertices, double *ma
       else if (ed < *(min))
         *min = ed;
 
-      Adjacency a;
-      a.v1 = i + 1;
-      a.v2 = j + 1;
-      a.distance = ed;
-      adjacencies[currentAdj] = a;
-      currentAdj++;
+      Distance d;
+      d.v1 = i + 1;
+      d.v2 = j + 1;
+      d.value = ed;
+      distances[currentDistance] = d;
+      currentDistance++;
     }
   }
 
-  return adjacencies;
+  return distances;
 }
 
 
-void printAdjacencies(Adjacency *adjacencies, int qtdVertices) {
-  int qtdAdjacencies = qtdVertices * qtdVertices - qtdVertices;
-    for (int i = 0; i < qtdAdjacencies; i++) {
-      printf("%d %d %.2lf\n", adjacencies[i].v1, adjacencies[i].v2, adjacencies[i].distance);
+void printDistances(Distance *distances, int qtdVertices) {
+  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
+    for (int i = 0; i < qtdDistances; i++) {
+      printf("%d %d %.2lf\n", distances[i].v1, distances[i].v2, distances[i].value);
     }
 }
 
 
-void exportAdjacencies(char *fileName, Adjacency *adjacencies, int qtdVertices) {
-  int qtdAdjacencies = qtdVertices * qtdVertices - qtdVertices;
+void exportDistances(char *fileName, Distance *distances, int qtdVertices) {
+  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
 
   FILE *exportFile = fopen(fileName, "wt");
   if (!exportFile) {
@@ -100,47 +100,47 @@ void exportAdjacencies(char *fileName, Adjacency *adjacencies, int qtdVertices) 
     return;
   }
 
-  for (int i = 0; i < qtdAdjacencies; i++) {
-    fprintf(exportFile, "%d,%d,%.6lf\n", adjacencies[i].v1, adjacencies[i].v2, adjacencies[i].distance);
+  for (int i = 0; i < qtdDistances; i++) {
+    fprintf(exportFile, "%d,%d,%.6lf\n", distances[i].v1, distances[i].v2, distances[i].value);
   }
 
   fclose(exportFile);
 }
 
 
-Adjacency *getNormalizedAdjacencies(Adjacency *adjacencies, int qtdVertices, double max, double min) {
+Distance *getNormalizedDistances(Distance *distances, int qtdVertices, double max, double min) {
 
   double normalize(double max, double min, double value) {
     return (value - min) / (max - min);
   };
 
-  int qtdAdjacencies = qtdVertices * qtdVertices - qtdVertices;
+  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
 
-  Adjacency *normalizedAdjacencies = malloc(qtdAdjacencies * sizeof(Adjacency));
+  Distance *normalizedDistances = malloc(qtdDistances * sizeof(Distance));
 
-  for (int i = 0; i < qtdAdjacencies; i++) {
-    Adjacency a = {
-      v1 : adjacencies[i].v1,
-      v2 : adjacencies[i].v2,
-      distance : normalize(max, min, adjacencies[i].distance)
+  for (int i = 0; i < qtdDistances; i++) {
+    Distance d = {
+      v1 : distances[i].v1,
+      v2 : distances[i].v2,
+      value : normalize(max, min, distances[i].value)
     };
 
-    normalizedAdjacencies[i] = a;
+    normalizedDistances[i] = d;
   }
 
-  return normalizedAdjacencies;
+  return normalizedDistances;
 }
 
 
-EdgeList *getGraphEdges(Adjacency *normalizedAdjacencies, int qtdVertices, double lim) {
+EdgeList *getGraphEdges(Distance *normalizedDistances, int qtdVertices, double lim) {
   EdgeList *list = malloc(sizeof(EdgeList));
   Edge *currentEdge;
   list->qtdEdges = 0;
 
-  int qtdAdjacencies = qtdVertices * qtdVertices - qtdVertices;
+  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
 
-  for (int i = 0; i < qtdAdjacencies; i++) {
-    if (normalizedAdjacencies[i].distance > lim)
+  for (int i = 0; i < qtdDistances; i++) {
+    if (normalizedDistances[i].value > lim)
       continue;
     list->qtdEdges++;
 
@@ -152,8 +152,8 @@ EdgeList *getGraphEdges(Adjacency *normalizedAdjacencies, int qtdVertices, doubl
       currentEdge = currentEdge->next;
     }
 
-    currentEdge->v1 = normalizedAdjacencies[i].v1;
-    currentEdge->v2 = normalizedAdjacencies[i].v2;
+    currentEdge->v1 = normalizedDistances[i].v1;
+    currentEdge->v2 = normalizedDistances[i].v2;
   }
 
   return list;
