@@ -1,3 +1,5 @@
+// Por: Pedro Fernandes e André Fidelis
+// Teoria dos Grafos - UDESC CCT 2022/02
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
