@@ -7,12 +7,13 @@
 #define bufferLength 255
 #define qtdVertices 150
 #define qtdDistances qtdVertices * qtdVertices - qtdVertices
-#define lim 0.03
+#define lim 0.05
 
 #define datasetFile "./files/iris-dataset.csv"
 #define euclidianFile "./files/euclidian-distances.csv"
 #define normalizedFile "./files/normalized-distances.csv"
 #define edgesFile "./files/graph-edges.csv"
+#define graphvizFile "./files/graphviz.csv"
 
 int main() {
   double max, min;
@@ -27,4 +28,8 @@ int main() {
   EdgeList *list = getGraphEdges(normalizedDistances, qtdVertices, lim);
 
   exportGraphEdges(edgesFile, list);
+
+  // Função cujo arquivo gerado deve ser colado em Graphviz Online
+  // (pesquisar no google)
+  exportGraphviz(graphvizFile, list);
 }

@@ -44,5 +44,6 @@ void exportDistances(char *fileName, Distance *distances, int qtdVertices);
 EdgeList *getGraphEdges(Distance *normalizedDistances, int qtdVertices, double lim);
 void printGraphEdges(EdgeList *list);
 void exportGraphEdges(char *fileName, EdgeList *list);
+void exportGraphviz(char *fileName, EdgeList *list);
 
 #endif

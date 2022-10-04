@@ -188,3 +188,23 @@ void exportGraphEdges(char *fileName, EdgeList *list) {
     aux = aux->next;
   }
 }
+
+
+void exportGraphviz(char *fileName, EdgeList *list) {
+  FILE *exportFile = fopen(fileName, "wt");
+
+  if (!exportFile) {
+    printf("There was an error trying to open %s file!\n", fileName);
+    return;
+  }
+
+  Edge *aux = list->first;
+  char string[bufferLength];
+
+  fprintf(exportFile, "graph G {\n");
+  while (aux != NULL) {
+    fprintf(exportFile, "  %d -- %d\n", aux->v1, aux->v2);
+    aux = aux->next;
+  }
+  fprintf(exportFile, "}\n");
+}
