@@ -11,7 +11,7 @@
 #define qtdDistances qtdVertices * qtdVertices - qtdVertices
 #define lim 0.05
 
-#define datasetFile "./files/iris-dataset.csv"
+#define datasetFile ".iris-dataset.csv"
 #define euclidianFile "./files/euclidian-distances.csv"
 #define normalizedFile "./files/normalized-distances.csv"
 #define edgesFile "./files/graph-edges.csv"
