@@ -6,7 +6,7 @@
 
 #define bufferLength 255
 
-Vertex *getVertices(char *fileName, int qtdVertices) {
+Vertex *getVertices(char *fileName) {
   Vertex *vertices = malloc(qtdVertices * sizeof(Vertex));
   FILE *data = fopen(fileName, "rt");
 
@@ -44,11 +44,6 @@ Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, 
 
   Distance *distances = malloc(qtdDistances * sizeof(Distance));
 
-  if (!max)
-    max = 0;
-  if (!min)
-    min = 0;
-
   int currentDistance = 0;
   for (int i = 0; i < qtdVertices; i++) {
     for (int j = 0; j < qtdVertices; j++) {
@@ -65,10 +60,11 @@ Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, 
 
       double ed = sqrt(pow(v1a1 - v2a1, 2) + pow(v1a2 - v2a2, 2) + pow(v1a3 - v2a3, 2) + pow(v1a4 - v2a4, 2));
 
-      if (ed > *(max))
+      if (!max || ed > *(max)) {
         *max = ed;
-      else if (ed < *(min))
+      } else if (!min || ed < *(min)) {
         *min = ed;
+      }
 
       Distance d;
       d.v1 = i + 1;
@@ -78,6 +74,8 @@ Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, 
       currentDistance++;
     }
   }
+
+  printf("max: %.6lf, min: %.6lf\n", *max, *min);
 
   return distances;
 }
@@ -132,21 +130,19 @@ Distance *getNormalizedDistances(Distance *distances, int qtdVertices, double ma
 }
 
 
-EdgeList *getGraphEdges(Distance *normalizedDistances, int qtdVertices, double lim) {
-  EdgeList *list = malloc(sizeof(EdgeList));
+Graph *createGraph(int qtdVertices, Distance *normalizedDistances, int qtdDistances, double lim) {
+  Graph *graph = malloc(sizeof(Graph));
   Edge *currentEdge;
-  list->qtdEdges = 0;
-
-  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
+  graph->qtdEdges = 0;
 
   for (int i = 0; i < qtdDistances; i++) {
     if (normalizedDistances[i].value > lim)
       continue;
-    list->qtdEdges++;
+    graph->qtdEdges++;
 
-    if (list->qtdEdges == 1) {
-      list->first = malloc(sizeof(Edge));
-      currentEdge = list->first;
+    if (graph->qtdEdges == 1) {
+      graph->firstEdge = malloc(sizeof(Edge));
+      currentEdge = graph->firstEdge;
     } else {
       currentEdge->next = malloc(sizeof(Edge));
       currentEdge = currentEdge->next;
@@ -156,7 +152,7 @@ EdgeList *getGraphEdges(Distance *normalizedDistances, int qtdVertices, double l
     currentEdge->v2 = normalizedDistances[i].v2;
   }
 
-  return list;
+  return graph;
 }
 
 

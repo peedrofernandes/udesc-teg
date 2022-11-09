@@ -9,9 +9,9 @@
 #define bufferLength 255
 #define qtdVertices 150
 #define qtdDistances qtdVertices * qtdVertices - qtdVertices
-#define lim 0.05
+#define lim 0.3
 
-#define datasetFile ".iris-dataset.csv"
+#define datasetFile "iris-dataset.csv"
 #define euclidianFile "./files/euclidian-distances.csv"
 #define normalizedFile "./files/normalized-distances.csv"
 #define edgesFile "./files/graph-edges.csv"
@@ -19,6 +19,7 @@
 
 int main() {
   double max, min;
+  // double min = 0.1, max = 7.085196;
 
   Vertex *vertices = getVertices(datasetFile, qtdVertices);
   Distance *distances = getEuclidianDistances(vertices, qtdVertices, &max, &min);
