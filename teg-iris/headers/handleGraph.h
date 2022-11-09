@@ -45,9 +45,4 @@ DistancesList *getEuclidianDistances(Graph *graph, double *min, double *max);
 void normalizeDistances(DistancesList *distancesList, double min, double max);
 void setEdges(Graph *graph, DistancesList *normalizedDistances, double lim);
 
-void exportGraph(char *fileName, Graph *graph);
-
-void exportDistances(char *fileName, DistancesList *list);
-void exportDegrees(char *fileName, Graph *graph);
-
 #endif

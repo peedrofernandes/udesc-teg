@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "handleGraph.h"
+#include "headers/handleGraph.h"
+#include "headers/exportData.h"
 
 #define bufferLength 255
 #define qtdVertices 150
@@ -19,20 +20,16 @@
 
 int main() {
   double max, min;
-
   Graph *graph = createGraph(datasetFile);
+
   DistancesList *distances = getEuclidianDistances(graph, &min, &max);
-
   printf("Min: %.4lf, Max: %.4lf\n", min, max);
-
   exportDistances(euclidianFile, distances);
 
   normalizeDistances(distances, min, max);
-
   exportDistances(normalizedFile, distances);
 
   setEdges(graph, distances, lim);
-
   exportGraph(graphFile, graph);
   exportDegrees(degreesFile, graph);
 }
