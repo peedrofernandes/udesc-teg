@@ -6,10 +6,12 @@ typedef struct distance {
   int v1;
   int v2;
   double value;
+  struct distance *next;
 } Distance;
 
+// Lista de distâncias
 typedef struct distancesList {
-  Distance *first;
+  Distance *firstDistance;
   int qtdDistances;
 } DistancesList;
 
@@ -31,12 +33,6 @@ typedef struct edge {
   struct edge *next;
 } Edge;
 
-// // Lista de arestas de um grafo
-// typedef struct edgeList {
-//   Edge *first;
-//   int qtdEdges;
-// } EdgeList;
-
 typedef struct graph {
   Vertex *firstVertex;
   Edge *firstEdge;
@@ -44,24 +40,14 @@ typedef struct graph {
   int qtdEdges;
 } Graph;
 
-// // Funções relacionadas à Vértices
-// Vertex *getVertices(char *fileName, int qtdVertices);
-// void printVertices(Vertex *vertices, int qtdVertices);
+Graph *createGraph(char *fileName);
+DistancesList *getEuclidianDistances(Graph *graph, double *min, double *max);
+void normalizeDistances(DistancesList *distancesList, double min, double max);
+void setEdges(Graph *graph, DistancesList *normalizedDistances, double lim);
 
-// // Funções relacionadas às distâncias euclidianas e normalizadas
-// Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, double *min);
-// Distance *getNormalizedDistances(Distance *distances, int qtdVertices, double max, double min);
-// void printDistances(Distance *distances, int qtdVertices);
-// void exportDistances(char *fileName, Distance *distances, int qtdVertices);
+void exportGraph(char *fileName, Graph *graph);
 
-// // Funções relacionadas à obtenção dos grafos
-// Graph *createGraph(int qtdVertices, Distance *normalizedDistances, int qtdDistances, double lim);
-// void printGraphEdges(Graph *graph);
-// void exportGraphEdges(char *fileName, Graph *graph);
-// void exportGraphviz(char *fileName, Graph *graph);
-
-DistancesList getEuclidianDistances(char *fileName, int *min, int *max);
-void normalizeDistances(DistancesList *distancesList, int min, int max);
-Graph createGraph(DistancesList *normalizedDistances);
+void exportDistances(char *fileName, DistancesList *list);
+void exportDegrees(char *fileName, Graph *graph);
 
 #endif

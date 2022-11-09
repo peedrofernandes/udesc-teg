@@ -14,25 +14,25 @@
 #define datasetFile "iris-dataset.csv"
 #define euclidianFile "./files/euclidian-distances.csv"
 #define normalizedFile "./files/normalized-distances.csv"
-#define edgesFile "./files/graph-edges.csv"
-#define graphvizFile "./files/graphviz.csv"
+#define graphFile "./files/graph.csv"
+#define degreesFile "./files/degrees.csv"
 
 int main() {
   double max, min;
-  // double min = 0.1, max = 7.085196;
 
-  Vertex *vertices = getVertices(datasetFile, qtdVertices);
-  Distance *distances = getEuclidianDistances(vertices, qtdVertices, &max, &min);
-  Distance *normalizedDistances = getNormalizedDistances(distances, qtdVertices, max, min);
+  Graph *graph = createGraph(datasetFile);
+  DistancesList *distances = getEuclidianDistances(graph, &min, &max);
 
-  exportDistances(euclidianFile, distances, qtdVertices);
-  exportDistances(normalizedFile, normalizedDistances, qtdVertices);
+  printf("Min: %.4lf, Max: %.4lf\n", min, max);
 
-  EdgeList *list = getGraphEdges(normalizedDistances, qtdVertices, lim);
+  exportDistances(euclidianFile, distances);
 
-  exportGraphEdges(edgesFile, list);
+  normalizeDistances(distances, min, max);
 
-  // Função cujo arquivo gerado deve ser colado em Graphviz Online
-  // (pesquisar no google)
-  exportGraphviz(graphvizFile, list);
+  exportDistances(normalizedFile, distances);
+
+  setEdges(graph, distances, lim);
+
+  exportGraph(graphFile, graph);
+  exportDegrees(degreesFile, graph);
 }

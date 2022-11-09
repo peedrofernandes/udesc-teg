@@ -6,201 +6,185 @@
 
 #define bufferLength 255
 
-Vertex *getVertices(char *fileName) {
-  Vertex *vertices = malloc(qtdVertices * sizeof(Vertex));
+// Tarefas
+// 1 - Criar um grafo vazio e Ler o arquivo original, obtendo todos os vértices
+// 2 - A partir dos vértices, obter todas as distâncias euclidianas entre ele
+// 2.1 - Exportar todas as distâncias euclidianas para um arquivo CSV
+// 3 - Normalizar todas as distâncias
+// 3.1 - Exportar todas as distâncias euclidianas normalizadas para um arquivo CSV
+// 4 - Determinar as arestas do grafo a partir das distâncias normalizadas e um limiar
+// 5 - Exportar um arquivo CSV com a quantidade de arestas e as arestas do grafo
+// 6 - Exportar um arquivo CSV com os graus de cada vértice
+
+Vertex *getVertexById(Graph *graph, int id) {
+  Vertex *currentVertex = graph->firstVertex;
+
+  while (currentVertex != NULL) {
+    if (currentVertex->id == id)
+      break;
+    currentVertex = currentVertex->next;
+  }
+
+  return currentVertex;
+}
+
+Graph *createGraph(char *fileName) {
+  Graph *graph = malloc(sizeof(Graph));
+  graph->qtdEdges = 0;
+  graph->qtdVertices = 0;
+
   FILE *data = fopen(fileName, "rt");
 
   if (data == NULL) {
-    printf("There was an error trying to open the file!\n");
+    printf("There was an error trying to open the file '%s'!\n", fileName);
     return 0;
   }
 
-  char string[bufferLength];
+  char *string = malloc(bufferLength * sizeof(char));
 
-  for (int i = 0; i < qtdVertices; i++) {
-    fgets(string, bufferLength, data);
-    double a1 = atof(strtok(string, ","));
-    double a2 = atof(strtok(NULL, ","));
-    double a3 = atof(strtok(NULL, ","));
-    double a4 = atof(strtok(NULL, ","));
-    Vertex v = {i+1, a1, a2, a3, a4};
-    vertices[i] = v;
+  Vertex *currentVertex;
+  // fscanf(data, "%*[^\n]"); // Descartar a primeira linha
+  string = fgets(string, bufferLength, data); // Descartar a primeira linha
+  while (!feof(data)) {
+    string = fgets(string, bufferLength, data);
+
+    graph->qtdVertices++;
+
+    if (graph->qtdVertices == 1) {
+      graph->firstVertex = malloc(sizeof(Vertex));
+      currentVertex = graph->firstVertex;
+    } else {
+      currentVertex->next = malloc(sizeof(Vertex));
+      currentVertex = currentVertex->next;
+    }
+
+    currentVertex->id = graph->qtdVertices;
+    currentVertex->a1 = atof(strtok(string, ","));
+    currentVertex->a2 = atof(strtok(NULL, ","));
+    currentVertex->a3 = atof(strtok(NULL, ","));
+    currentVertex->a4 = atof(strtok(NULL, ","));
   }
 
   fclose(data);
-  return vertices;
-}
-
-
-void printVertices(Vertex *vertices, int qtdVertices) {
-  for (int i = 0; i < qtdVertices; i++) {
-    printf("%d %.1lf %.1lf %.1lf %.1lf\n", vertices[i].id, vertices[i].a1, vertices[i].a2, vertices[i].a3, vertices[i].a4);
-  }
-} 
-
-
-Distance *getEuclidianDistances(Vertex *vertices, int qtdVertices, double *max, double *min) {
-  size_t qtdDistances = qtdVertices * qtdVertices - qtdVertices;
-
-  Distance *distances = malloc(qtdDistances * sizeof(Distance));
-
-  int currentDistance = 0;
-  for (int i = 0; i < qtdVertices; i++) {
-    for (int j = 0; j < qtdVertices; j++) {
-      if (i == j)
-        continue;
-      double v1a1 = vertices[i].a1;
-      double v1a2 = vertices[i].a2;
-      double v1a3 = vertices[i].a3;
-      double v1a4 = vertices[i].a4;
-      double v2a1 = vertices[j].a1;
-      double v2a2 = vertices[j].a2;
-      double v2a3 = vertices[j].a3;
-      double v2a4 = vertices[j].a4;
-
-      double ed = sqrt(pow(v1a1 - v2a1, 2) + pow(v1a2 - v2a2, 2) + pow(v1a3 - v2a3, 2) + pow(v1a4 - v2a4, 2));
-
-      if (!max || ed > *(max)) {
-        *max = ed;
-      } else if (!min || ed < *(min)) {
-        *min = ed;
-      }
-
-      Distance d;
-      d.v1 = i + 1;
-      d.v2 = j + 1;
-      d.value = ed;
-      distances[currentDistance] = d;
-      currentDistance++;
-    }
-  }
-
-  printf("max: %.6lf, min: %.6lf\n", *max, *min);
-
-  return distances;
-}
-
-
-void printDistances(Distance *distances, int qtdVertices) {
-  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
-    for (int i = 0; i < qtdDistances; i++) {
-      printf("%d %d %.2lf\n", distances[i].v1, distances[i].v2, distances[i].value);
-    }
-}
-
-
-void exportDistances(char *fileName, Distance *distances, int qtdVertices) {
-  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
-
-  FILE *exportFile = fopen(fileName, "wt");
-  if (!exportFile) {
-    printf("There was an error trying to open %s file!\n", fileName);
-    return;
-  }
-
-  for (int i = 0; i < qtdDistances; i++) {
-    fprintf(exportFile, "%d,%d,%.6lf\n", distances[i].v1, distances[i].v2, distances[i].value);
-  }
-
-  fclose(exportFile);
-}
-
-
-Distance *getNormalizedDistances(Distance *distances, int qtdVertices, double max, double min) {
-
-  double normalize(double max, double min, double value) {
-    return (value - min) / (max - min);
-  };
-
-  int qtdDistances = qtdVertices * qtdVertices - qtdVertices;
-
-  Distance *normalizedDistances = malloc(qtdDistances * sizeof(Distance));
-
-  for (int i = 0; i < qtdDistances; i++) {
-    Distance d = {
-      v1 : distances[i].v1,
-      v2 : distances[i].v2,
-      value : normalize(max, min, distances[i].value)
-    };
-
-    normalizedDistances[i] = d;
-  }
-
-  return normalizedDistances;
-}
-
-
-Graph *createGraph(int qtdVertices, Distance *normalizedDistances, int qtdDistances, double lim) {
-  Graph *graph = malloc(sizeof(Graph));
-  Edge *currentEdge;
-  graph->qtdEdges = 0;
-
-  for (int i = 0; i < qtdDistances; i++) {
-    if (normalizedDistances[i].value > lim)
-      continue;
-    graph->qtdEdges++;
-
-    if (graph->qtdEdges == 1) {
-      graph->firstEdge = malloc(sizeof(Edge));
-      currentEdge = graph->firstEdge;
-    } else {
-      currentEdge->next = malloc(sizeof(Edge));
-      currentEdge = currentEdge->next;
-    }
-
-    currentEdge->v1 = normalizedDistances[i].v1;
-    currentEdge->v2 = normalizedDistances[i].v2;
-  }
-
   return graph;
 }
 
+DistancesList *getEuclidianDistances(Graph *graph, double *min, double *max) {
+  DistancesList *list = malloc(sizeof(DistancesList));
+  list->qtdDistances = 0;
+  Distance *currentDistance;
 
-void printGraphEdges(EdgeList *list) {
-  Edge *aux = list->first;
+  Vertex *v1 = graph->firstVertex;
+  Vertex *v2 = graph->firstVertex;
 
-  printf("%d\n", list->qtdEdges);
-  while (aux != NULL) {
-    printf("%d, %d\n", aux->v1, aux->v2);
-    aux = aux->next;
+  while (v1 != NULL) {
+    v2 = v1->next;
+    while (v2 != NULL) {
+      list->qtdDistances++;
+
+      if (list->qtdDistances == 1) {
+        list->firstDistance = malloc(sizeof(Distance));
+        currentDistance = list->firstDistance;
+      } else {
+        currentDistance->next = malloc(sizeof(Distance));
+        currentDistance = currentDistance->next;
+      }
+
+      double d = sqrt(pow(v1->a1 - v2->a1, 2) + pow(v1->a2 - v2->a2, 2) + pow(v1->a3 - v2->a3, 2) + pow(v1->a4 - v2->a4, 2));
+
+      if (!min || d < (*min))
+        *min = d;
+      if (!max || d > (*max))
+        *max = d;
+
+      currentDistance->v1 = v1->id;
+      currentDistance->v2 = v2->id;
+      currentDistance->value = d;
+      v2 = v2->next;
+    }
+    v1 = v1->next;
+  }
+
+  return list;
+}
+
+void normalizeDistances(DistancesList *list, double min, double max) {
+  Distance *currentDistance = list->firstDistance;
+
+  while (currentDistance != NULL) {
+    currentDistance->value = (currentDistance->value - min) / (max - min);
+    currentDistance = currentDistance->next;
   }
 }
 
+void setEdges(Graph *graph, DistancesList *normalizedDistances, double lim) {
+  Edge *currentEdge;
+  graph->qtdEdges = 0;
 
-void exportGraphEdges(char *fileName, EdgeList *list) {
-  FILE *exportFile = fopen(fileName, "wt");
+  Distance *currentDistance = normalizedDistances->firstDistance;
 
-  if (!exportFile) {
-    printf("There was an error trying to open %s file!\n", fileName);
-    return;
+  while (currentDistance != NULL) {
+    if (currentDistance->value <= lim) {
+      graph->qtdEdges++;
+
+      if (graph->qtdEdges == 1) {
+        graph->firstEdge = malloc(sizeof(Edge));
+        currentEdge = graph->firstEdge;
+      } else {
+        currentEdge->next = malloc(sizeof(Edge));
+        currentEdge = currentEdge->next;
+      }
+
+      currentEdge->v1 = currentDistance->v1;
+      currentEdge->v2 = currentDistance->v2;
+
+      Vertex *v1 = getVertexById(graph, currentEdge->v1);
+      Vertex *v2 = getVertexById(graph, currentEdge->v2);
+      v1->deg++;
+      v2->deg++;
+    }
+    currentDistance = currentDistance->next;
   }
 
-  Edge *aux = list->first;
-  char string[bufferLength];
 
-  fprintf(exportFile, "%d\n", list->qtdEdges);
-  while (aux != NULL) {
-    fprintf(exportFile, "%d, %d\n", aux->v1, aux->v2);
-    aux = aux->next;
-  }
 }
 
+void exportGraph(char *fileName, Graph *graph) {
+  FILE *file = fopen(fileName, "wt");
 
-void exportGraphviz(char *fileName, EdgeList *list) {
-  FILE *exportFile = fopen(fileName, "wt");
+  fprintf(file, "%d\n", graph->qtdEdges);
 
-  if (!exportFile) {
-    printf("There was an error trying to open %s file!\n", fileName);
-    return;
+  Edge *currentEdge = graph->firstEdge;
+  while (currentEdge != NULL) {
+    fprintf(file, "%d, %d\n", currentEdge->v1, currentEdge->v2);
+    currentEdge = currentEdge->next;
   }
 
-  Edge *aux = list->first;
-  char string[bufferLength];
+  fclose(file);
+}
 
-  fprintf(exportFile, "graph G {\n");
-  while (aux != NULL) {
-    fprintf(exportFile, "  %d -- %d\n", aux->v1, aux->v2);
-    aux = aux->next;
+void exportDistances(char *fileName, DistancesList *list) {
+  FILE *file = fopen(fileName, "wt");
+
+  Distance *currentDistance = list->firstDistance;
+
+  while (currentDistance != NULL) {
+    fprintf(file, "%d, %d, %.8lf\n", currentDistance->v1, currentDistance->v2, currentDistance->value);
+    currentDistance = currentDistance->next;
   }
-  fprintf(exportFile, "}\n");
+
+  fclose(file);
+}
+
+void exportDegrees(char *fileName, Graph *graph) {
+  FILE *file = fopen(fileName, "wt");
+
+  Vertex *currentVertex = graph->firstVertex;
+
+  while (currentVertex != NULL) {
+    fprintf(file, "%d: %d\n", currentVertex->id, currentVertex->deg);
+    currentVertex = currentVertex->next;
+  }
+
+  fclose(file);
 }
