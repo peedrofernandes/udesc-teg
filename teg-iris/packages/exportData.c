@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// 1 - Exporta um arquivo CSV com a quantidade de arestas + todas as arestas do grafo
 void exportGraph(char *fileName, Graph *graph) {
   FILE *file = fopen(fileName, "wt");
 
@@ -16,6 +17,7 @@ void exportGraph(char *fileName, Graph *graph) {
   fclose(file);
 }
 
+// 2 - Exporta um arquivo CSV com todas as distâncias (normalizadas ou não) entre cada vértice
 void exportDistances(char *fileName, DistancesList *list) {
   FILE *file = fopen(fileName, "wt");
 
@@ -29,6 +31,7 @@ void exportDistances(char *fileName, DistancesList *list) {
   fclose(file);
 }
 
+// 3 - Exporta um arquivo CSV com os graus de cada vértice
 void exportDegrees(char *fileName, Graph *graph) {
   FILE *file = fopen(fileName, "wt");
 
