@@ -4,4 +4,5 @@
 **/*.out
 **/index
 teg-iris/files/*
+**/main
 
