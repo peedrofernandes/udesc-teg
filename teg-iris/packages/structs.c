@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "../headers/structs.h"
 
 Stack *createStack() {
   Stack *newStack = malloc(sizeof(Stack));
   newStack->qtdNodes = 0;
+  newStack->head = NULL;
   return newStack;
 }
 
@@ -12,11 +14,12 @@ void push(Stack *stack, void *elem) {
   newNode->data = elem;
   newNode->prev = stack->head;
   stack->head = newNode;
+  stack->qtdNodes++;
 }
 
 void *pop(Stack *stack) {
   if (stack->head == NULL)
-    return;
+    return 0;
 
   Node *node = stack->head;
   stack->head = stack->head->prev;

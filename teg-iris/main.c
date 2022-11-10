@@ -6,10 +6,8 @@
 #include <math.h>
 #include "headers/handleGraph.h"
 #include "headers/exportData.h"
+#include "headers/confusionMatrix.h"
 
-#define bufferLength 255
-#define qtdVertices 150
-#define qtdDistances qtdVertices * qtdVertices - qtdVertices
 #define lim 0.3
 
 #define datasetFile "iris-dataset.csv"
@@ -17,19 +15,25 @@
 #define normalizedFile "./files/normalized-distances.csv"
 #define graphFile "./files/graph.csv"
 #define degreesFile "./files/degrees.csv"
+#define componentsFile "./files/components.csv"
 
 int main() {
   double max, min;
   Graph *graph = createGraph(datasetFile);
 
-  DistancesList *distances = getEuclidianDistances(graph, &min, &max);
+  setEuclidianDistances(graph, &min, &max);
   printf("Min: %.4lf, Max: %.4lf\n", min, max);
-  exportDistances(euclidianFile, distances);
+  exportDistances(euclidianFile, graph);
 
-  normalizeDistances(distances, min, max);
-  exportDistances(normalizedFile, distances);
+  normalizeDistances(graph, min, max);
+  exportDistances(normalizedFile, graph);
 
-  setEdges(graph, distances, lim);
+  setEdges(graph, lim);
+  
   exportGraph(graphFile, graph);
   exportDegrees(degreesFile, graph);
+
+  markAllComponents(graph);
+  
+  exportComponents(componentsFile, graph);
 }

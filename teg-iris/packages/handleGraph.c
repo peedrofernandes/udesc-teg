@@ -31,6 +31,7 @@ Graph *createGraph(char *fileName) {
 
     Vertex *newVertex = malloc(sizeof(Vertex));
     newVertex->id = graph->qtdVertices;
+    newVertex->idComponent = -1;
     newVertex->a1 = atof(strtok(string, ","));
     newVertex->a2 = atof(strtok(NULL, ","));
     newVertex->a3 = atof(strtok(NULL, ","));
@@ -38,12 +39,13 @@ Graph *createGraph(char *fileName) {
     push(vertexStack, newVertex);
   }
 
-  Vertex *vertices = malloc(graph->qtdVertices * sizeof(Vertex));
-  for (int i = 0; i < graph->qtdVertices; i++) {
+  Vertex **vertices = malloc(graph->qtdVertices * sizeof(Vertex*));
+  for (int i = graph->qtdVertices - 1; i >= 0; i--) {
     Vertex *vertex = pop(vertexStack);
-    vertices[i] = *vertex;
+    vertices[i] = vertex;
   }
 
+  graph->vertices = vertices;
   destroyStack(vertexStack);
   fclose(data);
   return graph;
@@ -53,13 +55,16 @@ Graph *createGraph(char *fileName) {
 void *setEuclidianDistances(Graph *graph, double *min, double *max) {
   for (int i = 0; i < graph->qtdVertices; i++) {
     Stack *distancesStack = createStack();
-    Vertex *currentVertex = &graph->vertices[i];
+    Vertex *currentVertex = graph->vertices[i];
     currentVertex->qtdDistances = 0;
 
-    for (int j = i + 1; j < graph->qtdVertices; j++) {
+    for (int j = 0; j < graph->qtdVertices; j++) {
+      if (i == j)
+        continue;
+      
       Distance *distance = malloc(sizeof(Distance));
 
-      Vertex *v = &graph->vertices[j];
+      Vertex *v = graph->vertices[j];
       distance->v = v;
 
       double value = sqrt(pow(currentVertex->a1 - v->a1, 2) + pow(currentVertex->a2 - v->a2, 2) + pow(currentVertex->a3 - v->a3, 2) + pow(currentVertex->a4 - v->a4, 2));
@@ -75,10 +80,10 @@ void *setEuclidianDistances(Graph *graph, double *min, double *max) {
       currentVertex->qtdDistances++;
     }
 
-    Distance *distances = malloc(currentVertex->qtdDistances * sizeof(Distance));
-    for (int k = 0; k < currentVertex->qtdDistances; k++) {
+    Distance **distances = malloc(currentVertex->qtdDistances * sizeof(Distance*));
+    for (int k = currentVertex->qtdDistances - 1; k >= 0; k--) {
       Distance *distance = pop(distancesStack);
-      distances[k] = *distance;
+      distances[k] = distance;
     }
 
     currentVertex->distances = distances;
@@ -89,9 +94,9 @@ void *setEuclidianDistances(Graph *graph, double *min, double *max) {
 // 3 - Normaliza todas as distâncias
 void normalizeDistances(Graph *graph, double min, double max) {
   for (int i = 0; i < graph->qtdVertices; i++) {
-    Vertex *currentVertex = &graph->vertices[i];
+    Vertex *currentVertex = graph->vertices[i];
     for (int j = 0; j < currentVertex->qtdDistances; j++) {
-      Distance *currentDistance = &currentVertex->distances[j];
+      Distance *currentDistance = currentVertex->distances[j];
       currentDistance->value = (currentDistance->value - min) / (max - min);
     }
   }
@@ -99,27 +104,29 @@ void normalizeDistances(Graph *graph, double min, double max) {
 
 // 4 - Determina as arestas do grafo a partir das distâncias normalizadas e um limiar
 void setEdges(Graph *graph, double lim) {
+  graph->qtdEdges = 0;
   for (int i = 0; i < graph->qtdVertices; i++) {
     Stack *edgesStack = createStack();
-
-    Vertex *currentVertex = &graph->vertices[i];
+    Vertex *currentVertex = graph->vertices[i];
     currentVertex->deg = 0;
 
     for (int j = 0; j < currentVertex->qtdDistances; j++) {
-      Distance *currentDistance = &currentVertex->distances[j];
+      Distance *currentDistance = currentVertex->distances[j];
       if (currentDistance->value > lim)
         continue;
-      
+
+      graph->qtdEdges++;
       currentVertex->deg++;
       Vertex *v = currentDistance->v;
       push(edgesStack, v);
     }
 
-    Vertex *edges = malloc(currentVertex->deg * sizeof(Vertex));
-    for (int k = 0; k < currentVertex->deg; k++) {
+    Vertex **edges = malloc(currentVertex->deg * sizeof(Vertex*));
+    for (int k = 1; k <= currentVertex->deg; k++) {
       Vertex *edge = pop(edgesStack);
-      edges[k] = *edge;
+      edges[currentVertex->deg - k] = edge;
     }
+    currentVertex->edges = edges;
     destroyStack(edgesStack);
   }
 }

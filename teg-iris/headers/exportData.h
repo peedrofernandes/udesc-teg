@@ -6,5 +6,6 @@
 void exportGraph(char *fileName, Graph *graph);
 void exportDistances(char *fileName, Graph *graph);
 void exportDegrees(char *fileName, Graph *graph);
+void exportComponents(char *fileName, Graph *graph);
 
 #endif
