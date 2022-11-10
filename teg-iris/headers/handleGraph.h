@@ -12,13 +12,14 @@ typedef struct vertex {
   double a4;
   struct vertex *edges;
   int deg;
+  Distance *distances;
+  int qtdDistances;
   int idComponent;
 } Vertex;
 
 // Distância entre dois vértices, dados seus parâmetros
 typedef struct distance {
-  Vertex *v1;
-  Vertex *v2;
+  Vertex *v;
   double value;
 } Distance;
 
@@ -30,8 +31,8 @@ typedef struct graph {
 } Graph;
 
 Graph *createGraph(char *fileName);
-Distance *getEuclidianDistances(Graph *graph, double *min, double *max, int *qtdDistances);
-void normalizeDistances(Distance *distances, double min, double max, int qtdDistances);
-void setEdges(Graph *graph, double lim, Distance *normalizedDistances, int qtdDistances);
+void *setEuclidianDistances(Graph *graph, double *min, double *max);
+void normalizeDistances(Graph *graph, double min, double max);
+void setEdges(Graph *graph, double lim);
 
 #endif

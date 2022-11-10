@@ -4,7 +4,7 @@
 #define EXPORT_DATA_H
 
 void exportGraph(char *fileName, Graph *graph);
-void exportDistances(char *fileName, DistancesList *list);
+void exportDistances(char *fileName, Graph *graph);
 void exportDegrees(char *fileName, Graph *graph);
 
 #endif
